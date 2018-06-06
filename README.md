@@ -8,7 +8,7 @@ There are basically 4 steps to do ASE detection using our proposed method.
 
 Inside R file "ASE_paraEst.R":
 
-GDD(i,data) is a function to re-structurize the data to a structure that contains necessary information for analysis, i.e., SNPs, Replicates, counts  from maternal allel (YI) and total counts (NI). This structure is friendly to GLMM fitting in glmer() function in "lme4" package. This function can be easily modified to be applied to other similar real data structures.             
+GDD(i,data) is a function to clean and re-structurize the data to a structure that contains necessary information for analysis, i.e., SNPs, Replicates, counts  from maternal allel (YI) and total counts (NI). This structure is friendly to GLMM fitting in glmer() function in "lme4" package. This function can be easily modified to be applied to other similar real data structures.             
 filter(data) is a function to filter the genes with computational problems; para.est(data) is a function to estimate hyper parameters.
 
 Inside R file "ASE_LogPPs.R":
