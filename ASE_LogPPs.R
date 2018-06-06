@@ -5,17 +5,15 @@ library("nloptr")
 library("ggplot2")
 library("dplyr")
 library("stats4")
-######################################################################
+############################################################################
 # Empirical Bayes Estimator of beta, sigR2 and sigS2; one layer of laplace
-# functions to apply our proposed method to simulated data
 #### Gaussian prior
 # logpost11G calculate the posterior probability of model 1
 # logpost21G calculate the posterior probability of model 2
 # logpost31G calculate the posterior probability of model 3
 # logpost41G calculate the posterior probability of model 4
-#####################################################################
+###########################################################################
 
-######## Gaussian prior ########################
 logpost11G<-function(D,par){
     aR<-par$aRs
     bR<-par$bRs
