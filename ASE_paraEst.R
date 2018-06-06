@@ -3,26 +3,40 @@
 # GDD(i,data) is a function to re-structurize the data to a structure that    # 
 # contains necessary information for analysis, i.e., SNPs, Replicates, counts #
 # from maternal allel (YI) and total counts (NI). This structure is friendly  #
-# to GLMM fitting in glmer() function in "lme4" package. This function can be #                      #
+# to GLMM fitting in glmer() function in "lme4" package. This function can be #                      
 # easily modified to apply to other similar real data structures.             #
 
 #i is the gene number of each gene. Take the sample dataset for instance, the #
-# gene number of the first gene in this dataset is 277.                       #
+# gene number of the first gene in this dataset is 28.                       #
 
-# > unique(sample$gene)[1]
-# [1] 277
-# > GDD(277,data=sample)
-#    SNP NI YI Rep
-#     1  22  6   1
-#     1  23 11   3
-#     1  16 11   4
-#     2  22  6   1
-#     2  23 11   3
-#     2  18 10   4
-#     3  47 30   1
-#     3  23 11   2
-#     3  39 17   3
-#     3  51 23   4
+# > unique(mysample$gene)[1]
+# [1] 28
+#  > GDD(28,data=mysample)
+#   SNP NI YI Rep
+#    1  6  3   1
+#    1  7  2   2
+#    1  3  1   3
+#    2  6  5   2
+#    3 14  4   1
+#    3  4  1   2
+#    3 18  8   3
+#    3 13  7   4
+#    4  8  2   1
+#    4  7  3   2
+#    4  5  4   3
+#    4 10  3   4
+#    5  8  2   1
+#    5  5  2   2
+#    5 10  6   3
+#    5 13  7   4
+#    6  8  2   1
+#    6  9  3   2
+#    6 10  4   3
+#    6 12  5   4
+#    7  5  2   1
+#    7  4  1   2
+#    7  9  0   3
+#    7  9  2   4
 
 ##############################################################################
 
@@ -51,6 +65,7 @@ GDD=function(i,data){
 
 
 ###############################################################################
+#filter(data) is a function to filter the genes with computational problems
 #para.est(data) is a function estimate hyper parameters
 ##############################################################################
 filter<-function(data){
