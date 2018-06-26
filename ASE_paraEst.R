@@ -147,7 +147,7 @@ para.est<-function(data,index){
     bSs<-uSs*(uSs^2/vSs+1)
     ## MLE to estimate paras of Gaussian prior for fixed gene effect
     mlemus<- mean(betasf)
-    mlesigmas<-sum((betasf-mlemus)^2)/length(betasf)
+    mlesigmas<-sqrt(sum((betasf-mlemus)^2)/length(betasf))
     calibration<-data.frame(aRs=aRs,bRs=bRs,aSs=aSs, bSs=bSs, 
                             mlemus=mlemus,mlesigmas=mlesigmas)
     return(calibration) 
