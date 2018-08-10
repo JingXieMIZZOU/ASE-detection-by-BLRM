@@ -93,59 +93,52 @@ filter<-function(data){
 
 
 para.est<-function(data,index){
+    # index is the result returned by above function filter(data)
     ###### add two obs and then fit GLMM 
     geneNum<-index
-    sigR<- sigS<- beta<- rep(NA,length(geneNum))
+    P_SNP<- P_gene<- B4<- R4<- S4<- rep(NA,length(geneNum))
     for (i in geneNum){
         DATA<-GDD(i,data)
         D<-data.frame(SNP=DATA$SNP,NI=DATA$NI+2,YI=DATA$YI+1,Rep=DATA$Rep)
         tryCatch({
             print(i)
-            mod1=glmer(formula = cbind(YI, NI-YI)~ 0+(1 |Rep),
-                       family = binomial, data = D)
             mod2=glmer(formula = cbind(YI, NI-YI)~ 1+(1 |Rep),
                        family = binomial, data = D)
             mod3=glmer(formula = cbind(YI, NI-YI)~ 0+(1 |Rep)+(1|SNP),
                        family = binomial, data = D)
             mod4=glmer(formula = cbind(YI, NI-YI)~ 1+(1 |Rep)+(1|SNP),
                        family = binomial, data =D)
-            A1<-BIC(mod1)
-            A2<-BIC(mod2)
-            A3<-BIC(mod3)
-            A4<-BIC(mod4)
-            if (A1==min(A1,A2,A3,A4)) {
-                sigR[i]<-lapply(VarCorr(mod1),'[[',1)$Rep
-            }
-            else if (A2==min(A1,A2,A3,A4)) {
-                sigR[i]<-lapply(VarCorr(mod2),'[[',1)$Rep
-                beta[i]<- as.vector(fixef(mod2))  
-            }
-            else if (A3==min(A1,A2,A3,A4)) {
-                sigS[i]<-lapply(VarCorr(mod3),'[[',1)$SNP
-                sigR[i]<-lapply(VarCorr(mod3),'[[',1)$Rep
-            }  
-            else {
-                sigS[i]<-lapply(VarCorr(mod4),'[[',1)$SNP
-                sigR[i]<-lapply(VarCorr(mod4),'[[',1)$Rep
-                beta[i]<- as.vector(fixef(mod4)) 
+            B4[i]<- as.vector(fixef(mod4))
+            R4[i]<-lapply(VarCorr(mod4),'[[',1)$Rep
+            S4[i]<-lapply(VarCorr(mod4),'[[',1)$SNP
+            P_SNP[i]<-anova(mod2,mod4)$`Pr(>Chisq)`[2]
+            P_gene[i]<- anova(mod3,mod4)$`Pr(>Chisq)`[2]
             }
         },error=function(e){cat("error: ",conditionMessage(e), "\n")})
     }
-    # extract GLMM estiamtes
-    sigRf<-sigR[!is.na(sigR)]
-    sigSf<-sigS[!is.na(sigS)]
-    betasf<-beta[!is.na(beta)]
+    # organize resutls
+    res<- data.frame(geneNum=geneNum, P_gene=P_gene, P_SNP=P_SNP, beta=B4, Rep=R4, SNP=S4)
+    res$q_gene<-qvalue(res$P_gene)$qvalues
+    res$q_SNP<-qvalue(res$P_SNP)$qvalues
+    set.seed(23457)
+    tiebreaker <- sample(1:nrow(res), replace=TRUE)
     ## MOM to estimate paras of Inverse Gamma dist. for sigmaRsquare
+    sigRf<-na.omit(res$Rep)
     uRs<-mean(sigRf)
     vRs<-var(sigRf)
     aRs<-uRs^2/vRs+2
     bRs<-uRs*(uRs^2/vRs+1)
     ## MOM to estimate paras of Inverse Gamma dist. for sigmaSsquareS
+    res_SNP<-res[order(res$P_SNP,tiebreaker,decreasing = F),]
+    sigSf<-na.omit(res_SNP[res_SNP$q_SNP<=0.05,]$SNP)
     uSs<-mean(sigSf)
     vSs<-var(sigSf)
     aSs<-uSs^2/vSs+2
     bSs<-uSs*(uSs^2/vSs+1)
     ## MLE to estimate paras of Gaussian prior for fixed gene effect
+    res_gene<-res[order(res$P_gene,tiebreaker,decreasing = F),]
+    betas<-res_gene[res_gene$q_gene<=0.05,]$beta
+    betasf<-betas[!is.na(betas)]
     mlemus<- mean(betasf)
     mlesigmas<-sqrt(sum((betasf-mlemus)^2)/length(betasf))
     calibration<-data.frame(aRs=aRs,bRs=bRs,aSs=aSs, bSs=bSs, 
