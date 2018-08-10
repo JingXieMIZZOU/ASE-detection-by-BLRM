@@ -9,14 +9,18 @@
 
 detection<-function(data){
     
+    # note function para.est() accounts for data augmentation process but PPSFUN doesn't.
+    # so, need to do data augmentation before calculate posterior probability 
+    
     # hyper parameter estimation
     clean_index<-filter(data)
     paras<-para.est(data,index=clean_index)
-    
+    # data augmentation before calculate posterior probability
+    data[,c(4,6,8,10)]<-data[,c(4,6,8,10)]+2
+    data[,c(5,7,9,11)]<-data[,c(5,7,9,11)]+1
     ## realPPS is the log of PP before standardize
     temp<-lapply(clean_index,PPsFUN,par=paras,data=data)
     realPP<-do.call(rbind, lapply(temp, head, 1))
-    
     ## normalized PPs
     realPPS<-exp(realPP[,2:5])
     realPPSS<-matrix(nrow=nrow(realPP),ncol=6)
