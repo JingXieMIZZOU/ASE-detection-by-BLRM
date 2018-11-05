@@ -114,7 +114,7 @@ para.est<-function(data,index){
             P_SNP[i]<-anova(mod2,mod4)$`Pr(>Chisq)`[2]
             P_gene[i]<- anova(mod3,mod4)$`Pr(>Chisq)`[2]
             }
-        },error=function(e){cat("error: ",conditionMessage(e), "\n")})
+        ,error=function(e){cat("error: ",conditionMessage(e), "\n")})
     }
     # organize resutls
     res<- data.frame(geneNum=geneNum, P_gene=P_gene, P_SNP=P_SNP, beta=B4, Rep=R4, SNP=S4)
